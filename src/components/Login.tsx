@@ -13,6 +13,7 @@ export function Login() {
     email: "",
     senha: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -26,8 +27,35 @@ export function Login() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Redireciona para a página de Home (a tela simples)
-    router.push("/home");
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: form.email,
+          senha: form.senha,
+        }),
+      });
+
+      const data = await response.json();
+
+      if(response.ok){
+        alert(data.message);
+        router.push('/home');
+      } else {
+        alert(`Erro no login: ${data.message || 'Credenciais inválidas'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login: ', error);
+      alert('Erro ao se conectar com o servidor, tente novamente. ');
+    } finally {
+      setLoading(false);
+    }
+    
   }
 
   return (
@@ -102,7 +130,7 @@ export function Login() {
             type="submit"
             className="w-full text-white bg-[#3A5B22] hover:bg-[#497248] font-semibold py-2 rounded-xl transition"
           >
-            Entrar
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
 
           <p className="text-center text-sm mt-4 text-[#193829]">
