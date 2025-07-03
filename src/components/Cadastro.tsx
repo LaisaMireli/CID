@@ -17,6 +17,8 @@ export function Cadastro() {
     termos: false,
   });
 
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -34,9 +36,36 @@ export function Cadastro() {
       return;
     }
 
-    alert("Formulário de Cadastro enviado com sucesso!");
-    // Redireciona para a página de Home (a tela simples)
-    router.push("/home");
+    setLoading(true);
+
+    try {
+      const response = await fetch('api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nome: form.nome,
+          email: form.email,
+          senha: form.senha,
+        }),
+      });
+
+      const data = await response.json();
+
+      if(response.ok){
+        alert(data.message);
+        router.push('/home')
+      } else {
+        alert(`Erro: ${data.message || 'Algo deu errado'}`)
+      }
+    } catch (error) {
+      console.error('Erro ao enviar formulário: ', error);
+      alert('Erro ao se conectar com o servidor. Tente novamente')
+      
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -128,8 +157,9 @@ export function Cadastro() {
           <button
             type="submit"
             className="w-full text-white bg-[#3A5B22] hover:bg-[#497248] font-semibold py-2 rounded-xl transition"
+            disabled={loading}
           >
-            Cadastrar
+            {loading ? 'Cadastrando...' : 'Cadastrar'}
           </button>
 
           <p className="text-center text-sm mt-4 text-[#193829]">
