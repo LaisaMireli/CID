@@ -43,6 +43,7 @@ model SystemStatus {
 // Tabela para guardar os dados dos usuários
 model User {
   id        Int      @id @default(autoincrement()) // ID único
+  name      String
   email     String   @unique // Email do usuário, deve ser único
   password  String   // Senha do usuário (vamos salvar uma versão criptografada)
   

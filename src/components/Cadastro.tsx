@@ -11,9 +11,9 @@ import logo from "@/assets/logo.jpg";
 
 export function Cadastro() {
   const [form, setForm] = useState({
-    nome: "",
+    name: "",
     email: "",
-    senha: "",
+    password: "",
     termos: false,
   });
 
@@ -45,9 +45,9 @@ export function Cadastro() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          nome: form.nome,
+          name: form.name,
           email: form.email,
-          senha: form.senha,
+          password: form.password,
         }),
       });
 
@@ -96,8 +96,8 @@ export function Cadastro() {
             <input
               type="text"
               id="nome"
-              name="nome"
-              value={form.nome}
+              name="name"
+              value={form.name}
               onChange={handleChange}
               placeholder="Digite seu nome"
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3A5B22]"
@@ -127,9 +127,9 @@ export function Cadastro() {
             </label>
             <input
               type="password"
-              id="senha"
-              name="senha"
-              value={form.senha}
+              id="password"
+              name="password"
+              value={form.password}
               onChange={handleChange}
               placeholder="Digite sua senha"
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3A5B22]"
