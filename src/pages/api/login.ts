@@ -1,45 +1,52 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import  fs  from "fs";
-import path from "path";
-import { use } from "framer-motion/m";
-
-const usersFilePath = path.resolve(process.cwd(), 'data', 'users.json');
+import type { NextApiRequest, NextApiResponse } from 'next';
+import prisma from '../../lib/prisma';
+import bcrypt from 'bcryptjs';      
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if(req.method === 'POST'){
-        const { email, senha } = req.body;
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
+    return res.status(405).end(`Method ${req.method} not allowed`);
+  }
 
-        if(!email || !senha){
-            return res.status(400).json({message: 'Email e senha obrigatórios'});
-        }
+  try {
+    const { email, password } = req.body;
 
-        try {
-            if(!fs.existsSync(usersFilePath)){
-                fs.writeFileSync(usersFilePath, '[]', 'utf-8');
-            }
-
-            const fileContent = fs.readFileSync(usersFilePath, 'utf-8');
-            const users = fileContent ? JSON.parse(fileContent) : [];
-            const user = users.find((u: any) => u.email === email);
-
-            if(!user || user.senha !== senha){
-                return res.status(401).json({message: 'Email ou senha inválidos'});
-            }
-
-            return res.status(200).json({
-                message: 'Login bem-sucedido',
-                user: { 
-                    id: user.id,
-                    nome: user.nome,
-                    email: user.email
-                }
-            });
-        } catch (error) {
-            console.error('Erro ao fazer login: ', error);
-            return res.status(500).json({message: 'Erro interno do servidor'})
-        }
-    } else {
-        res.setHeader('Allow', ['POST']);
-        res.status(405).end(`Method ${req.method} no allowed`)
+    // Validar se email e senha foram fornecidos
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
     }
+
+    // 1. Encontrar o usuário no banco de dados pelo email
+    const user = await prisma.user.findUnique({
+      where: { email: email },
+    });
+
+    // 2. Se o usuário não for encontrado, as credenciais são inválidas
+    if (!user) {
+      return res.status(401).json({ message: 'Email ou senha inválidos' });
+    }
+
+    // 3. Comparar a senha enviada com a senha criptografada no banco
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    // 4. Se a comparação de senhas falhar, as credenciais são inválidas
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: 'Email ou senha inválidos' });
+    }
+
+    // 5. Se tudo estiver correto, o login é bem-sucedido
+    // Retornamos os dados do usuário, mas NUNCA a senha.
+    return res.status(200).json({
+      message: 'Login bem-sucedido',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+
+  } catch (error) {
+    console.error('Erro ao fazer login: ', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
 }

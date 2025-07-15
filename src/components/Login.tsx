@@ -1,6 +1,4 @@
-// src/components/Login.tsx
 "use client";
-
 import Image from "next/image";
 import folha from "@/assets/folha.jpg";
 import logo from "@/assets/logo.jpg";
@@ -11,7 +9,7 @@ import Link from "next/link";
 export function Login() {
   const [form, setForm] = useState({
     email: "",
-    senha: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +35,7 @@ export function Login() {
         },
         body: JSON.stringify({
           email: form.email,
-          senha: form.senha,
+          password: form.password,
         }),
       });
 
@@ -100,9 +98,9 @@ export function Login() {
             </label>
             <input
               type="password"
-              id="senha"
-              name="senha"
-              value={form.senha}
+              id="password"
+              name="password"
+              value={form.password}
               onChange={handleChange}
               placeholder="Digite sua senha"
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3A5B22]"
