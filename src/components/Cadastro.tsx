@@ -54,7 +54,7 @@ export function Cadastro() {
       const data = await response.json();
 
       if(response.ok){
-        alert(data.message);
+        alert("Usuário cadastrado com sucesso");
         router.push('/home')
       } else {
         alert(`Erro: ${data.message || 'Algo deu errado'}`)

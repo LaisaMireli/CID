@@ -1,40 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+## 🚀 Projeto CID - Dashboard de Monitoramento
 
-## Getting Started
+Este é o repositório para a aplicação web (dashboard) do Projeto CID, desenvolvido para a disciplina de Tecnologia Web 2. A aplicação exibe dados enviados por um robô de sistemas embarcados e permite o controle de usuários e do próprio robô.
 
-First, run the development server:
+### ✅ Pré-requisitos
 
+- Node.js (versão 18.x ou superior)
+- npm (geralmente já vem instalado com o Node.js)
+- Git
+
+### ⚙️ Instalação e Configuração Local
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/LaisaMireli/CID.git
+cd CID
+npm install
+```
+Agora na raiz do projeto(CID), crie um arquivo .env e cole a seguinte linha:
+```
+DATABASE_URL="file:./dev.db"
+```
+Agora, precisamos dizer ao Prisma para criar o banco de dados SQLite local com todas as tabelas definidas no schema.
+
+Execute o seguinte comando no terminal:
+```
+npx prisma migrate dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Agora basta iniciar o servidor com o seguinte código: 
+```
+npm run dev
+```
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Após executar o comando, a aplicação estará disponível em http://localhost:3000.
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### 🛠️ Tecnologias Utilizadas
+- Framework: [Next.js](https://nextjs.org/)
+- Linguagem: [TypeScript](https://www.typescriptlang.org/)
+- Estilização: [Tailwind CSS](https://tailwindcss.com/)
+- ORM: [Prisma](https://www.prisma.io/)
+- Banco de Dados (Dev): [SQLite](https://www.sqlite.org/index.html)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+### 💻 Desenvolvedores
+- [Laisa Mireli](https://github.com/LaisaMireli)
+- [Lairton Pessoa](https://github.com/LairtonPessoa)
+- [Yan Marcelo](https://github.com/YanMarcelo)
