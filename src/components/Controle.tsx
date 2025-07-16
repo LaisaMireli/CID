@@ -1,4 +1,4 @@
-// src/components/Controle.tsx
+
 "use client";
 
 import React, { useState } from 'react';
@@ -15,16 +15,66 @@ const buttonVariants = {
   tap: { scale: 0.95 },
 };
 
-export function Controle() {
+export default function Controle() {
   const [robotStatus, setRobotStatus] = useState<'idle' | 'moving' | 'paused' | 'returning'>('idle');
   const [currentLocation, setCurrentLocation] = useState<string | null>(null);
+  const [mensagemEnvio, setMensagemEnvio] = useState<string>('');
+  const [caminho, setCaminho] = useState<any[]>([]);
 
-  const sendCommand = (command: 'start' | 'stop' | 'returnToBase' | 'pause', locationId?: string) => {
+  // Função para adicionar um passo ao caminho ao clicar nos botões de localização
+  const moveToLocation = (locationId: string) => {
+    if (robotStatus !== 'moving' && robotStatus !== 'idle') {
+      alert('Robô não pode se mover neste estado. Inicie ou retome a operação.');
+      return;
+    }
+    setRobotStatus('moving');
+    setCurrentLocation(locationId);
+    setCaminho(prev => [
+      ...prev,
+      { distance: 10, direction: 90, sector: locationId, toMeasure: false }
+    ]);
+    alert(`Robô: Movendo para ${locationId}...`);
+  };
+
+  // Função para enviar o caminho para a API ao clicar em "Iniciar"
+  async function enviarCaminho() {
+    if (caminho.length === 0) {
+      setMensagemEnvio('Adicione passos antes de enviar!');
+      return;
+    }
+    setMensagemEnvio('Robô está indo...');
+    try {
+      const res = await fetch('/api/path', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(caminho),
+      });
+      await res.json();
+
+      caminho.forEach((passo, idx) => {
+        setTimeout(() => {
+          if (idx === 0) {
+            setMensagemEnvio('Robô está mapeando...');
+          }
+          if (idx === caminho.length - 1) {
+            setMensagemEnvio('Robô terminou o caminho!');
+            setCaminho([]);
+          }
+        }, idx * 1000);
+      });
+    } catch (error) {
+      setMensagemEnvio('Erro ao enviar comando para o robô.');
+    }
+  }
+
+  // Comandos globais
+  const sendCommand = (command: 'start' | 'stop' | 'returnToBase' | 'pause') => {
     let newStatus: typeof robotStatus = robotStatus;
     let feedback = '';
 
     switch (command) {
       case 'start':
+        enviarCaminho();
         newStatus = 'moving';
         feedback = 'Robô iniciado e pronto para operar.';
         break;
@@ -46,24 +96,10 @@ export function Controle() {
         break;
     }
     setRobotStatus(newStatus);
-    console.log(`Comando enviado: ${command} ${locationId ? 'para ' + locationId : ''}. Status: ${feedback}`);
-    alert(`Robô: ${feedback}`);
+    if (command !== 'start') alert(`Robô: ${feedback}`);
   };
 
-  const moveToLocation = (locationId: string) => {
-    if (robotStatus !== 'moving' && robotStatus !== 'idle') {
-      alert('Robô não pode se mover neste estado. Inicie ou retome a operação.');
-      return;
-    }
-    setRobotStatus('moving');
-    setCurrentLocation(locationId);
-    console.log(`Robô movendo para: ${locationId}`);
-    alert(`Robô: Movendo para ${locationId}...`);
-  };
-
-  // APENAS AS LOCALIZAÇÕES ESPECIFICADAS: A1, A2, B1, B2
   const locations = ['A1', 'A2', 'B1', 'B2'];
-
 
   return (
     <div className="flex-1 p-8 bg-gray-50 min-h-screen">
@@ -97,6 +133,51 @@ export function Controle() {
         </div>
       </motion.div>
 
+      {/* Caminho Montado - layout melhorado */}
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        className="bg-white p-8 rounded-lg shadow-md mb-10"
+      >
+        <h2 className="text-2xl font-semibold text-[#133023] mb-6 flex items-center gap-2">
+          <MapPin size={28} className="text-[#3A5B22]" />
+          Caminho Montado
+        </h2>
+        <div className="mb-4">
+          <span className="text-gray-700 font-medium">Caminho atual:</span>
+          <ul className="mt-2 space-y-2">
+            {caminho.length === 0 ? (
+              <li className="text-gray-400 italic">Nenhum passo adicionado.</li>
+            ) : (
+              caminho.map((p, idx) => (
+                <li
+                  key={idx}
+                  className="bg-gray-100 rounded px-4 py-2 flex flex-col sm:flex-row sm:items-center gap-2 text-[#133023] shadow-sm"
+                >
+                  <span className="font-semibold">Passo {idx + 1}:</span>
+                  <span>{p.distance}cm</span>
+                  <span>Direção {p.direction}°</span>
+                  <span>Setor {p.sector}</span>
+                  <span>
+                    Medição:{" "}
+                    <span className={p.toMeasure ? "text-green-700 font-bold" : "text-red-700 font-bold"}>
+                      {p.toMeasure ? "Sim" : "Não"}
+                    </span>
+                  </span>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+        <button
+          className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 font-semibold shadow"
+          onClick={() => setCaminho([])}
+        >
+          Limpar Caminho
+        </button>
+      </motion.div>
+
       <motion.div
         variants={sectionVariants}
         initial="hidden"
@@ -112,7 +193,7 @@ export function Controle() {
             onClick={() => sendCommand('start')}
             className="flex items-center bg-[#3A5B22] hover:bg-[#55743B] text-white font-semibold py-3 px-6 rounded-md shadow-md transition-all duration-200"
           >
-            <Play size={20} className="mr-2" /> Iniciar
+            <Play size={20} className="mr-2" /> Iniciar (Enviar caminho)
           </motion.button>
           <motion.button
             variants={buttonVariants}
@@ -142,6 +223,7 @@ export function Controle() {
             <Home size={20} className="mr-2" /> Voltar à Base
           </motion.button>
         </div>
+        <p className="mt-4 text-lg text-gray-900">{mensagemEnvio}</p>
       </motion.div>
 
       {/* Seção de Controle por Localização */}
@@ -152,7 +234,6 @@ export function Controle() {
         className="bg-white p-8 rounded-lg shadow-md mb-10"
       >
         <h2 className="text-2xl font-semibold text-[#133023] mb-6">Mover para Localização Específica</h2>
-        {/* Ajustado o grid para ficar melhor com menos itens */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
           {locations.map(locationId => (
             <motion.button
