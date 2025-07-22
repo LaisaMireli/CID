@@ -1,51 +1,53 @@
-// Bloco que configura o gerador de código do Prisma
 generator client {
   provider = "prisma-client-js"
 }
 
-// Bloco que configura a fonte de dados (nosso banco de dados)
+
 datasource db {
-  provider = "sqlite" // Estamos dizendo ao Prisma que vamos usar SQLite
-  url      = env("DATABASE_URL") // O endereço do banco está no arquivo .env
+  provider = "sqlite" 
+  url      = env("DATABASE_URL") 
 }
 
-// ------ NOSSAS TABELAS ------
 
-// Tabela para guardar os dados de medição dos sensores
 model Measurement {
-  id           Int      @id @default(autoincrement()) // ID único para cada linha
+  id           Int      @id @default(autoincrement()) 
   
-  // Dados dos sensores (baseado no JSON "Measurement")
-  temperature  Float?   // Campo do tipo número com casas decimais. O '?' significa que pode ficar em branco.
+  temperature  Float?   
   humidity     Float?   
-  soilMoisture Int?     // Campo do tipo número inteiro.
+  soilMoisture Int?     
   luminosity   Int?
   
-  // Campo para os erros (baseado no JSON "Measurement")
+  
   errors       String // Um único texto para guardar os erros, separados por vírgula.
   
-  createdAt    DateTime @default(now()) // Registra a data e hora exata que o dado foi salvo.
+  createdAt    DateTime @default(now()) 
 }
 
-// Tabela para guardar os dados de status do sistema
-model SystemStatus {
-  id              Int      @id @default(autoincrement()) // ID único
 
-  // Dados de status (baseado no JSON "SystemStatus")
+model SystemStatus {
+  id              Int      @id @default(autoincrement()) 
+
   batteryLevel    Int
   connectionLevel Int
-  currentActivity Int
+  currentActivity String
   currentSector   String
 
-  createdAt       DateTime @default(now()) // Registra a data e hora.
+  createdAt       DateTime @default(now()) 
 }
 
-// Tabela para guardar os dados dos usuários
 model User {
-  id        Int      @id @default(autoincrement()) // ID único
+  id        Int      @id @default(autoincrement()) 
   name      String
-  email     String   @unique // Email do usuário, deve ser único
-  password  String   // Senha do usuário (vamos salvar uma versão criptografada)
+  email     String   @unique 
+  password  String   
   
   createdAt DateTime @default(now())
+}
+
+
+model RobotCommand {
+  id         Int      @id @default(autoincrement())
+  path       Json     
+  isExecuted Boolean  @default(false) 
+  createdAt  DateTime @default(now())
 }

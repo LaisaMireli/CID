@@ -1,16 +1,19 @@
-// src/pages/dashboard.tsx
-import React from 'react';
-import Layout from '@/components/Layout';
-import { DashboardComponent } from '@/components/Dashboard'; // <-- ATENÇÃO AQUI: COM CHAVES
+// Arquivo: src/pages/dashboard.tsx (VERSÃO CORRIGIDA E SIMPLES)
 
-// GARANTA que esta função é o componente da sua página
-const DashboardPage: React.FC = () => {
+import { DashboardComponent } from "@/components/Dashboard";
+import Head from 'next/head';
+
+const DashboardPage = () => {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>Dashboard | Projeto CID</title>
+      </Head>
+      
+      {/* A página apenas renderiza o componente, sem o Layout por enquanto para simplificar */}
       <DashboardComponent />
-    </Layout>
+    </>
   );
 };
 
-// GARANTA que esta página é exportada como 'default'
 export default DashboardPage;

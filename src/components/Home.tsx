@@ -174,7 +174,7 @@ export function HomeComponent() {
            Comece a monitorar suas plantas com o CID e veja a diferença em sua colheita.
           </motion.p>
           <motion.div variants={itemVariants}>
-            <Link href="/cadastro" passHref>
+            <Link href="/controle" passHref>
               <motion.button
                 variants={buttonHoverVariant}
                 whileHover="hover"

@@ -1,0 +1,7 @@
+-- CreateTable
+CREATE TABLE "RobotCommand" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "path" JSONB NOT NULL,
+    "isExecuted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
